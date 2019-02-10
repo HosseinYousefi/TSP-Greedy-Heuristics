@@ -49,18 +49,35 @@ void unite(int u, int v) {
     par[find(u)] = find(v);
 }
 
+map<int, int> id;
+vector<vector<int>> adj;
+vector<bool> mark;
+vector<Point> points;
+
+void dfs(int v) {
+    cout << id[v] << ' ';
+    mark[v] = true;
+    for (int u : adj[v]) {
+        if (!mark[u]) {
+            dfs(u);
+        }
+    }
+}
+
 int main(int argc, char* argv[]) {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    assert(argc >= 2); // an input file please!
-    ifstream fin(argv[1]);
     int n;
-    fin >> n;
+    cin >> n;
     par.resize(n);
     iota(par.begin(), par.end(), 0);
-    vector<Point> points(n);
+    points.resize(n);
+    mark.resize(n);
+    adj.resize(n);
     for (int i = 0; i < n; ++i) {
-        fin >> points[i];
+        int x;
+        cin >> x >> points[i];
+        id[i] = x;
     }
     vector<tuple<ld, int, int>> edges;
     for (int i = 0; i < n; ++i) {
@@ -72,13 +89,17 @@ int main(int argc, char* argv[]) {
     vector<int> deg(n);
     int no = 0;
     ld answer = 0;
-    for (auto [d, u, v] : edges) {
+    for (auto e : edges) {
+        int d, u, v;
+        tie(d, u, v) = e;
         if (no == n - 1) {
             if (deg[v] < 2 && deg[u] < 2) {
                 answer += d;
                 ++deg[v];
                 ++deg[u];
                 unite(u, v);
+                adj[u].push_back(v);
+                adj[v].push_back(u);
                 ++no;
                 break;
             }
@@ -88,9 +109,13 @@ int main(int argc, char* argv[]) {
                 ++deg[v];
                 ++deg[u];
                 unite(u, v);
+                adj[u].push_back(v);
+                adj[v].push_back(u);
                 ++no;
             }
         }
     }
-    cout << answer << '\n';
+    dfs(0);
+    cout << id[0] << '\n';
+    // cout << answer << '\n';
 }

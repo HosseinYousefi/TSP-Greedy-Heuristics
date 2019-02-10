@@ -39,21 +39,28 @@ ld dist(const Point& a, const Point& b) {
     return sqrt(square(a.x - b.x) + square(a.y - b.y));
 }
 
+map<int, int> id;
+vector<Point> points;
+vector<bool> mark;
+vector<vector<int>> adj;
+
 int main(int argc, char* argv[]) {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     srand((unsigned)time(0));
-    assert(argc >= 2); // an input file please!
-    ifstream fin(argv[1]);
     int n;
-    fin >> n;
-    vector<Point> points(n);
+    cin >> n;
+    points.resize(n);
     for (int i = 0; i < n; ++i) {
-        fin >> points[i];
+        int x;
+        cin >> x >> points[i];
+        id[i] = x;
     }
-    vector<bool> mark(n);
+    mark.resize(n);
     int current = rand() % n;
     ld totalCost = 0;
+    int finish = current;
+    cout << id[current] << ' ';
     for (int cnt = 0; cnt < n - 1; ++cnt) {
         mark[current] = true;
         pair<ld, int> best{INFINITY, 0};
@@ -63,7 +70,8 @@ int main(int argc, char* argv[]) {
         }
         totalCost += best.first;
         current = best.second;
+        cout << id[current] << ' ';
     }
+    cout << id[finish] << ' ';
     totalCost += dist(points[current], points[0]);
-    cout << totalCost << '\n';
 }
