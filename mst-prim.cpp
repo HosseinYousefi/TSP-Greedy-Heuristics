@@ -42,7 +42,6 @@ ld dist(const Point& a, const Point& b) {
 int main(int argc, char* argv[]) {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    srand((unsigned)time(0));
     assert(argc >= 2); // an input file please!
     ifstream fin(argv[1]);
     int n;
@@ -51,19 +50,19 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < n; ++i) {
         fin >> points[i];
     }
+    vector<ld> d(n, INFINITY);
     vector<bool> mark(n);
-    int current = rand() % n;
-    ld totalCost = 0;
-    for (int cnt = 0; cnt < n - 1; ++cnt) {
-        mark[current] = true;
-        pair<ld, int> best{INFINITY, 0};
-        for (int i = 0; i < n; ++i) {
-            if (!mark[i])
-                best = min(best, make_pair(dist(points[i], points[current]), i));
-        }
-        totalCost += best.first;
-        current = best.second;
+    d[0] = 0;
+    for (int i = 0; i < n - 1; ++i) {
+        pair<ld, int> bestPoint{INFINITY, 0};
+        for (int j = 0; j < n; ++j)
+            if (!mark[j])
+                bestPoint = min(bestPoint, make_pair(d[j], j));
+        int u = bestPoint.second;
+        mark[u] = true;
+        for (int j = 0; j < n; ++j)
+            if (!mark[j] && dist(points[u], points[j]) < d[j])
+                d[j] = dist(points[u], points[j]);
     }
-    totalCost += dist(points[current], points[0]);
-    cout << totalCost << '\n';
+    cout << "lowerbound: " << accumulate(d.begin(), d.end(), 0.l) << '\n';
 }

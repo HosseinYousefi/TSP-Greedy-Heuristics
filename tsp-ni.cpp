@@ -54,16 +54,38 @@ int main(int argc, char* argv[]) {
     vector<bool> mark(n);
     int current = rand() % n;
     ld totalCost = 0;
+    vector<int> nxt(n, -1); // storing the tour in some sort of circular linked list for easier insertion
+    nxt[current] = current;
+    int firstOne = current;
     for (int cnt = 0; cnt < n - 1; ++cnt) {
         mark[current] = true;
-        pair<ld, int> best{INFINITY, 0};
+        ld best = INFINITY;
+        int neighbor = -1, insertAfter = -1;
         for (int i = 0; i < n; ++i) {
-            if (!mark[i])
-                best = min(best, make_pair(dist(points[i], points[current]), i));
+            if (!mark[i]) {
+                int cur = firstOne;
+                for (int j = 0; j <= cnt; ++j) {
+                    if (
+                            dist(points[i], points[cur]) 
+                        +   dist(points[i], points[nxt[cur]])
+                        -   dist(points[cur], points[nxt[cur]])
+                        <   best
+                    ) {
+                        best =      
+                            dist(points[i], points[cur]) 
+                        +   dist(points[i], points[nxt[cur]])
+                        -   dist(points[cur], points[nxt[cur]]);
+                        neighbor = i;
+                        insertAfter = cur;
+                    }
+                    cur = nxt[cur];
+                }
+            }
         }
-        totalCost += best.first;
-        current = best.second;
+        current = neighbor;
+        totalCost += best;
+        nxt[current] = nxt[insertAfter];
+        nxt[insertAfter] = current;
     }
-    totalCost += dist(points[current], points[0]);
     cout << totalCost << '\n';
 }
